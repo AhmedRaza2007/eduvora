@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Users2, Child, Phone, Mail, Award, CreditCard, CalendarCheck } from 'lucide-react';
+import { Users2, Baby, Phone, Mail, Award, CreditCard, CalendarCheck } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
 import { Badge } from '@/components/ui/Badge';
 import { TableSkeleton } from '@/components/ui/Skeleton';

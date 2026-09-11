@@ -17,6 +17,7 @@ import {
   ChevronRight,
   Globe,
   Sparkles,
+  Award,
 } from 'lucide-react';
 
 export default function LandingPage() {

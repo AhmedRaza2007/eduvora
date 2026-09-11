@@ -47,11 +47,23 @@ export async function POST(req: NextRequest) {
     }
 
     if (body.action === 'CREATE_INVOICE') {
-      const count = await db.feeInvoice.count();
-      const invoiceNo = `INV-2026-${(count + 1).toString().padStart(3, '0')}`;
+      let invoiceNo = body.invoiceNo;
+      if (!invoiceNo) {
+        const count = await db.feeInvoice.count();
+        const year = new Date().getFullYear();
+        let counter = count + 1;
+        invoiceNo = `INV-${year}-${counter.toString().padStart(3, '0')}`;
+        let existing = await db.feeInvoice.findUnique({ where: { invoiceNo } });
+        while (existing) {
+          counter++;
+          invoiceNo = `INV-${year}-${counter.toString().padStart(3, '0')}`;
+          existing = await db.feeInvoice.findUnique({ where: { invoiceNo } });
+        }
+      }
 
       const invoice = await db.feeInvoice.create({
         data: {
+          invoiceNo,
           institutionId: inst.id,
           studentId: body.studentId,
           feeTypeId: body.feeTypeId,
