@@ -5,6 +5,21 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding Eduvora database...');
 
+  // 0. Platform Super Admin
+  const superAdmin = await prisma.user.upsert({
+    where: { email: 'superadmin@eduvora.com' },
+    update: {},
+    create: {
+      name: 'Eduvora SuperAdmin',
+      email: 'superadmin@eduvora.com',
+      password: 'password123',
+      role: 'SUPER_ADMIN',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150',
+      phone: '+92 300 1234567',
+      status: 'ACTIVE',
+    },
+  });
+
   // 1. Create Institution
   const inst = await prisma.institution.upsert({
     where: { code: 'EDUVORA-MAIN' },
@@ -106,6 +121,21 @@ async function main() {
       role: 'PARENT',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150',
       phone: '+1 (555) 567-8901',
+    },
+  });
+
+  const studentUser = await prisma.user.upsert({
+    where: { email: 'student@eduvora.edu' },
+    update: {},
+    create: {
+      institutionId: inst.id,
+      branchId: mainBranch.id,
+      name: 'Lucas Vance',
+      email: 'student@eduvora.edu',
+      password: 'password123',
+      role: 'STUDENT',
+      avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150',
+      phone: '+1 (555) 111-2222',
     },
   });
 
@@ -275,12 +305,13 @@ async function main() {
     {
       studentId: 'STU-2026-001',
       admissionNo: 'ADM-2026-101',
+      userId: studentUser.id,
       firstName: 'Lucas',
       lastName: 'Vance',
       gender: 'Male',
       dob: '2010-04-12',
       phone: '+1 (555) 111-2222',
-      email: 'lucas.vance@student.eduvora.edu',
+      email: 'student@eduvora.edu',
       classId: class10.id,
       sectionId: sec10A.id,
       rollNo: '101',
@@ -814,6 +845,123 @@ async function main() {
         fileType: 'pdf',
       },
     ],
+  });
+
+  // 17. Seed Second Institution for Multi-Tenant Isolation Verification
+  const instApex = await prisma.institution.upsert({
+    where: { code: 'APEX-PK' },
+    update: {},
+    create: {
+      name: 'Apex Institute of Sciences',
+      type: 'College',
+      code: 'APEX-PK',
+      logo: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=200',
+      address: 'Plot 45-B, Sector G-9, Blue Area',
+      city: 'Islamabad',
+      province: 'Islamabad Capital Territory',
+      country: 'Pakistan',
+      currency: 'PKR',
+      phone: '+92 51 9876543',
+      email: 'contact@apex.edu.pk',
+      website: 'https://apex.edu.pk',
+      status: 'ACTIVE',
+      subscriptionPlan: 'PROFESSIONAL',
+    },
+  });
+
+  const apexBranch = await prisma.branch.create({
+    data: {
+      institutionId: instApex.id,
+      name: 'Islamabad Main Campus',
+      code: 'APEX-ISB-01',
+      address: 'Plot 45-B, Sector G-9, Islamabad',
+      city: 'Islamabad',
+      phone: '+92 51 9876543',
+      isMain: true,
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: 'admin@apex.edu.pk' },
+    update: {},
+    create: {
+      institutionId: instApex.id,
+      branchId: apexBranch.id,
+      name: 'Dr. Tariq Mahmood (Apex Principal)',
+      email: 'admin@apex.edu.pk',
+      password: 'password123',
+      role: 'ADMIN',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150',
+      phone: '+92 301 5551234',
+    },
+  });
+
+  const apexSession = await prisma.academicSession.create({
+    data: {
+      institutionId: instApex.id,
+      name: '2026-2027',
+      startDate: '2026-09-01',
+      endDate: '2027-06-30',
+      isCurrent: true,
+      status: 'ACTIVE',
+    },
+  });
+
+  const apexClass = await prisma.class.create({
+    data: {
+      institutionId: instApex.id,
+      branchId: apexBranch.id,
+      name: 'FSc Pre-Medical Part 1',
+      code: 'FSC-MED-1',
+      program: 'FSc Pre-Medical',
+      department: 'Biological Sciences',
+      semester: 'Year 1',
+    },
+  });
+
+  const apexSection = await prisma.section.create({
+    data: {
+      classId: apexClass.id,
+      name: 'Section Alpha',
+      capacity: 50,
+    },
+  });
+
+  const apexStudentUser = await prisma.user.upsert({
+    where: { email: 'student@apex.edu.pk' },
+    update: {},
+    create: {
+      institutionId: instApex.id,
+      branchId: apexBranch.id,
+      name: 'Hamza Tariq',
+      email: 'student@apex.edu.pk',
+      password: 'password123',
+      role: 'STUDENT',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150',
+      phone: '+92 333 4445555',
+    },
+  });
+
+  await prisma.student.create({
+    data: {
+      institutionId: instApex.id,
+      branchId: apexBranch.id,
+      userId: apexStudentUser.id,
+      studentId: 'APEX-STU-001',
+      admissionNo: 'APEX-ADM-001',
+      firstName: 'Hamza',
+      lastName: 'Tariq',
+      gender: 'Male',
+      dob: '2008-05-14',
+      phone: '+92 333 4445555',
+      email: 'student@apex.edu.pk',
+      classId: apexClass.id,
+      sectionId: apexSection.id,
+      rollNo: '501',
+      admissionDate: '2026-09-01',
+      sessionId: apexSession.id,
+      status: 'ACTIVE',
+    },
   });
 
   console.log('✅ Eduvora Database Seeded Successfully with complete real data!');

@@ -1,13 +1,37 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { getAuthContext } from '@/lib/auth';
+import { recordAuditLog } from '@/lib/audit';
 
 export async function GET(req: NextRequest) {
   try {
+    const auth = await getAuthContext(req);
     const { searchParams } = new URL(req.url);
+
+    let institutionId = auth.institutionId;
+    if (!institutionId && auth.isSuperAdmin) {
+      institutionId = searchParams.get('institutionId');
+    }
+    if (!institutionId) {
+      const firstInst = await db.institution.findFirst({ where: { status: 'ACTIVE' } });
+      institutionId = firstInst?.id || null;
+    }
+
+    if (!institutionId) {
+      return NextResponse.json({ success: true, exams: [], studentResultCard: null });
+    }
+
     const examId = searchParams.get('examId') || '';
-    const studentId = searchParams.get('studentId') || '';
+    let studentId = searchParams.get('studentId') || '';
+
+    // If student logged in, lock to own studentId
+    if (auth.role === 'STUDENT' && auth.user?.id) {
+      const studentRec = await db.student.findFirst({ where: { userId: auth.user.id } });
+      if (studentRec) studentId = studentRec.id;
+    }
 
     const exams = await db.exam.findMany({
+      where: { institutionId },
       include: {
         session: true,
         schedules: { include: { class: true, subject: true, marks: { include: { student: true } } } },
@@ -36,7 +60,7 @@ export async function GET(req: NextRequest) {
       studentResultCard = { result, marks };
     }
 
-    return NextResponse.json({ success: true, exams, studentResultCard });
+    return NextResponse.json({ success: true, exams, studentResultCard, institutionId });
   } catch (error) {
     return NextResponse.json({ success: false, error: 'Failed to fetch exams data' }, { status: 500 });
   }
@@ -44,18 +68,34 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await getAuthContext(req);
     const body = await req.json();
-    const inst = await db.institution.findFirst();
-    const session = await db.academicSession.findFirst({ where: { isCurrent: true } });
 
-    if (!inst || !session) {
-      return NextResponse.json({ success: false, error: 'Session/Institution not found' }, { status: 400 });
+    let institutionId = auth.institutionId;
+    if (!institutionId && auth.isSuperAdmin) {
+      institutionId = body.institutionId;
+    }
+    if (!institutionId) {
+      const firstInst = await db.institution.findFirst({ where: { status: 'ACTIVE' } });
+      institutionId = firstInst?.id || null;
+    }
+
+    if (!institutionId) {
+      return NextResponse.json({ success: false, error: 'Institution not found' }, { status: 400 });
+    }
+
+    const session = await db.academicSession.findFirst({
+      where: { institutionId, isCurrent: true },
+    });
+
+    if (!session) {
+      return NextResponse.json({ success: false, error: 'Active academic session not found' }, { status: 400 });
     }
 
     if (body.action === 'CREATE_EXAM') {
       const exam = await db.exam.create({
         data: {
-          institutionId: inst.id,
+          institutionId,
           sessionId: session.id,
           name: body.name,
           type: body.type || 'MID_TERM',
@@ -63,6 +103,18 @@ export async function POST(req: NextRequest) {
           endDate: body.endDate,
         },
       });
+
+      await recordAuditLog({
+        institutionId,
+        userId: auth.user?.id,
+        userName: auth.user?.name,
+        userRole: auth.role,
+        action: 'CREATE',
+        module: 'EXAMS',
+        description: `Created exam term: ${exam.name} (${exam.type}).`,
+        req,
+      });
+
       return NextResponse.json({ success: true, exam });
     }
 
@@ -167,6 +219,17 @@ export async function POST(req: NextRequest) {
           },
         });
       }
+
+      await recordAuditLog({
+        institutionId,
+        userId: auth.user?.id,
+        userName: auth.user?.name,
+        userRole: auth.role,
+        action: 'UPDATE',
+        module: 'EXAMS',
+        description: `Entered marks for student in exam schedule ${body.examScheduleId}: ${marksObtained}/${totalMarks} (${grade}).`,
+        req,
+      });
 
       return NextResponse.json({ success: true, mark });
     }

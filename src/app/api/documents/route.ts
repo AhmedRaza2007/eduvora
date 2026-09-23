@@ -1,13 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { getAuthContext } from '@/lib/auth';
 
 export async function GET(req: NextRequest) {
   try {
+    const auth = await getAuthContext(req);
     const { searchParams } = new URL(req.url);
+
+    let institutionId = auth.institutionId;
+    if (!institutionId && auth.isSuperAdmin) {
+      institutionId = searchParams.get('institutionId');
+    }
+    if (!institutionId) {
+      const firstInst = await db.institution.findFirst({ where: { status: 'ACTIVE' } });
+      institutionId = firstInst?.id || null;
+    }
+
+    if (!institutionId) {
+      return NextResponse.json({ success: true, documents: [] });
+    }
+
     const entityType = searchParams.get('entityType') || '';
     const entityId = searchParams.get('entityId') || '';
 
-    const where: any = {};
+    const where: any = { institutionId };
     if (entityType) where.entityType = entityType;
     if (entityId) where.entityId = entityId;
 
@@ -16,7 +32,7 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json({ success: true, documents });
+    return NextResponse.json({ success: true, documents, institutionId });
   } catch (error) {
     return NextResponse.json({ success: false, error: 'Failed to fetch documents' }, { status: 500 });
   }
@@ -24,16 +40,25 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await getAuthContext(req);
     const body = await req.json();
-    const inst = await db.institution.findFirst();
 
-    if (!inst) {
+    let institutionId = auth.institutionId;
+    if (!institutionId && auth.isSuperAdmin) {
+      institutionId = body.institutionId;
+    }
+    if (!institutionId) {
+      const firstInst = await db.institution.findFirst({ where: { status: 'ACTIVE' } });
+      institutionId = firstInst?.id || null;
+    }
+
+    if (!institutionId) {
       return NextResponse.json({ success: false, error: 'Institution not found' }, { status: 400 });
     }
 
     const doc = await db.document.create({
       data: {
-        institutionId: inst.id,
+        institutionId,
         entityType: body.entityType || 'STUDENT',
         entityId: body.entityId,
         title: body.title,
@@ -41,6 +66,7 @@ export async function POST(req: NextRequest) {
         fileUrl: body.fileUrl || 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
         fileSize: body.fileSize || '1.5 MB',
         fileType: body.fileType || 'pdf',
+        uploadedById: auth.user?.id || null,
       },
     });
 

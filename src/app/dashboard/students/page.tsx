@@ -6,6 +6,7 @@ import {
   Users,
   Search,
   Plus,
+  Upload,
   Filter,
   Eye,
   Trash2,
@@ -21,6 +22,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { Badge } from '@/components/ui/Badge';
 import { TableSkeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { BulkImportModal } from '@/components/BulkImportModal';
 
 export default function StudentsPage() {
   const { toast } = useToast();
@@ -33,6 +35,7 @@ export default function StudentsPage() {
 
   // Modals
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -139,12 +142,20 @@ export default function StudentsPage() {
           </h2>
           <p className="text-xs text-gray-500 dark:text-slate-400 mt-1">Manage active enrollments, parents, and student directory</p>
         </div>
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/25 flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" /> Enroll New Student
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsBulkModalOpen(true)}
+            className="px-4 py-2.5 rounded-xl text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 border border-indigo-200 dark:border-indigo-800 transition-all flex items-center gap-2"
+          >
+            <Upload className="w-4 h-4" /> Bulk Import CSV
+          </button>
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-600/25 flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" /> Enroll New Student
+          </button>
+        </div>
       </div>
 
       {/* Filter Bar */}
@@ -396,6 +407,13 @@ export default function StudentsPage() {
           </div>
         </form>
       </Modal>
+
+      {/* Bulk Import CSV Modal */}
+      <BulkImportModal
+        isOpen={isBulkModalOpen}
+        onClose={() => setIsBulkModalOpen(false)}
+        onSuccess={fetchStudents}
+      />
 
       {/* Delete Confirmation */}
       <ConfirmDialog

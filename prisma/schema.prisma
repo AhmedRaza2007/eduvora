@@ -11,17 +11,27 @@ datasource db {
 }
 
 model Institution {
-  id            String   @id @default(uuid())
-  name          String
-  type          String   @default("School") // School, College, University, Coaching Center
-  code          String   @unique
-  logo          String?
-  address       String?
-  phone         String?
-  email         String?
-  website       String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                 String   @id @default(uuid())
+  name               String
+  type               String   @default("School") // School, College, University, Coaching Center
+  code               String   @unique
+  logo               String?
+  address            String?
+  city               String?
+  province           String?
+  country            String?  @default("Pakistan")
+  currency           String   @default("PKR")
+  phone              String?
+  email              String?
+  website            String?
+  status             String   @default("ACTIVE") // ACTIVE, SUSPENDED, TRIAL, INACTIVE
+  subscriptionPlan   String   @default("FREE") // FREE, STARTER, PROFESSIONAL, ENTERPRISE
+  subscriptionStatus String   @default("ACTIVE") // TRIAL, ACTIVE, SUSPENDED, EXPIRED
+  trialEndsAt        DateTime?
+  maxStudents        Int      @default(500)
+  maxBranches        Int      @default(3)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   branches      Branch[]
   users         User[]
@@ -43,6 +53,7 @@ model Institution {
   announcements Announcement[]
   documents     Document[]
   attendances   Attendance[]
+  auditLogs     AuditLog[]
 }
 
 model Branch {
@@ -51,8 +62,10 @@ model Branch {
   name          String
   code          String
   address       String?
+  city          String?
   phone         String?
   isMain        Boolean  @default(false)
+  status        String   @default("ACTIVE") // ACTIVE, INACTIVE
   createdAt     DateTime @default(now())
 
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
@@ -64,26 +77,30 @@ model Branch {
 
 model User {
   id            String   @id @default(uuid())
-  institutionId String
+  institutionId String?
   branchId      String?
   name          String
   email         String   @unique
   password      String
-  role          String   @default("ADMIN") // SUPER_ADMIN, ADMIN, TEACHER, ACCOUNTANT, RECEPTIONIST, PARENT, STUDENT
+  role          String   @default("ADMIN") // SUPER_ADMIN, OWNER, ADMIN, TEACHER, ACCOUNTANT, RECEPTIONIST, STAFF, PARENT, STUDENT
   avatar        String?
   phone         String?
+  cnic          String?
   status        String   @default("ACTIVE") // ACTIVE, INACTIVE, SUSPENDED
+  permissions   String?  // JSON string of permissions e.g. ["students.view"]
+  lastLoginAt   DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
-  branch        Branch?     @relation(fields: [branchId], references: [id])
+  institution   Institution? @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  branch        Branch?      @relation(fields: [branchId], references: [id])
   
   studentProfile Student?
   parentProfile  Parent?
   teacherProfile Teacher?
   staffProfile   Staff?
   notifications  Notification[]
+  auditLogs      AuditLog[]
 }
 
 model Parent {
@@ -106,8 +123,16 @@ model Parent {
 model Class {
   id             String   @id @default(uuid())
   institutionId  String
+  branchId       String?
   name           String   // e.g., Grade 10, BS Computer Science, Pre-Engineering
   code           String?
+  department     String?  // e.g. Computer Science, Natural Sciences, Humanities, Commerce
+  program        String?  // e.g. FSc, ICS, FA, BS, Matric, O-Level, A-Level
+  semester       String?  // e.g. Semester 1, Fall 2026, Year 1
+  creditHours    Int?
+  batchTiming    String?  // e.g. 04:00 PM - 06:00 PM (for coaching academies)
+  batchDays      String?  // e.g. Mon, Wed, Fri
+  feeMonthly     Float?
   classTeacherId String?
   createdAt      DateTime @default(now())
 
@@ -521,4 +546,21 @@ model Document {
   createdAt     DateTime @default(now())
 
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id            String   @id @default(uuid())
+  institutionId String?
+  userId        String?
+  userName      String?
+  userRole      String?
+  action        String   // CREATE, UPDATE, DELETE, LOGIN, LOGOUT, STATUS_CHANGE, PUBLISH, PAYMENT
+  module        String   // AUTH, INSTITUTION, STUDENTS, FEES, ATTENDANCE, EXAMS, USERS, SETTINGS, BRANCHES
+  description   String
+  details       String?
+  ipAddress     String?
+  createdAt     DateTime @default(now())
+
+  institution   Institution? @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  user          User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
