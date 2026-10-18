@@ -20,6 +20,8 @@ import {
   Award,
 } from 'lucide-react';
 
+import VideoSection from '@/components/landing/VideoSection';
+
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-white selection:bg-indigo-500 selection:text-white font-sans">
@@ -36,6 +38,9 @@ export default function LandingPage() {
           </div>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+            <a href="#discover" className="text-indigo-400 hover:text-indigo-300 transition-colors font-semibold flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Discover
+            </a>
             <a href="#features" className="hover:text-white transition-colors">Features</a>
             <a href="#institutions" className="hover:text-white transition-colors">Institutions</a>
             <a href="#benefits" className="hover:text-white transition-colors">Benefits</a>
@@ -86,10 +91,10 @@ export default function LandingPage() {
               Explore Live Dashboard <ChevronRight className="w-5 h-5" />
             </Link>
             <a
-              href="#preview"
-              className="px-8 py-4 rounded-2xl text-base font-bold text-slate-300 bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:text-white transition-all flex items-center gap-2"
+              href="#discover"
+              className="px-8 py-4 rounded-2xl text-base font-bold text-slate-300 bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:text-white transition-all flex items-center gap-2 group"
             >
-              Watch Interactive Demo
+              <Sparkles className="w-4 h-4 text-amber-400 group-hover:rotate-12 transition-transform" /> Watch Launch Video (35s)
             </a>
           </div>
 
@@ -109,6 +114,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Discover Eduvora Video Section */}
+      <VideoSection />
 
       {/* Supported Institution Types */}
       <section id="institutions" className="py-20 border-t border-slate-900 bg-slate-950/60">

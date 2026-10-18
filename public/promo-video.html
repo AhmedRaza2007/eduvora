@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eduvora — Official LinkedIn Launch Video Studio (35s 16:9)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #090d16;
+      color: #f8fafc;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .studio-header {
+      width: 100%;
+      max-width: 1280px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .studio-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .badge {
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .studio-header h1 {
+      font-size: 20px;
+      font-weight: 800;
+      background: linear-gradient(to right, #fff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 1280px;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 40px rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    canvas#videoCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+    }
+    .controls-bar {
+      width: 100%;
+      max-width: 1280px;
+      margin-top: 16px;
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .progress-container {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .timeline-bar {
+      flex: 1;
+      height: 8px;
+      background: #1e293b;
+      border-radius: 4px;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .timeline-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
+      border-radius: 4px;
+      transition: width 0.05s linear;
+    }
+    .time-display {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #94a3b8;
+      min-width: 110px;
+      text-align: right;
+    }
+    .buttons-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .btn-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+    }
+    .btn-secondary {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .btn-secondary:hover {
+      background: #334155;
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+    }
+    .btn-success:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+    }
+    .scene-indicators {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #64748b;
+    }
+    .scene-pill {
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: #1e293b;
+      transition: all 0.2s;
+    }
+    .scene-pill.active {
+      background: rgba(99, 102, 241, 0.2);
+      color: #818cf8;
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      font-weight: 700;
+    }
+    #statusMessage {
+      font-size: 12px;
+      color: #a855f7;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="studio-header">
+    <div class="studio-title">
+      <span class="badge">1080p • 16:9</span>
+      <h1>Eduvora LinkedIn Launch Video (35 Seconds)</h1>
+    </div>
+    <div id="statusMessage">Ready to play / export</div>
+  </div>
+
+  <div class="video-wrapper">
+    <!-- Native 1080p Canvas: 1920 x 1080 -->
+    <canvas id="videoCanvas" width="1920" height="1080"></canvas>
+  </div>
+
+  <div class="controls-bar">
+    <div class="progress-container">
+      <div class="timeline-bar" id="timelineBar">
+        <div class="timeline-fill" id="timelineFill"></div>
+      </div>
+      <div class="time-display" id="timeDisplay">00:00 / 00:35</div>
+    </div>
+
+    <div class="buttons-row">
+      <div class="btn-group">
+        <button class="btn-primary" id="playBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Play Video
+        </button>
+        <button class="btn-secondary" id="restartBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg> Restart
+        </button>
+        <button class="btn-secondary" id="soundBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg> Music: On
+        </button>
+      </div>
+
+      <div class="scene-indicators">
+        <span class="scene-pill active" id="sp1">1. Hook</span>
+        <span class="scene-pill" id="sp2">2. Multi-Tenant</span>
+        <span class="scene-pill" id="sp3">3. Academics</span>
+        <span class="scene-pill" id="sp4">4. PKR Finance</span>
+        <span class="scene-pill" id="sp5">5. Roles & Dark</span>
+        <span class="scene-pill" id="sp6">6. Launch CTA</span>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn-success" id="exportBtn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export 1080p Video (.webm)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('videoCanvas');
+    const ctx = canvas.getContext('2d');
+    const playBtn = document.getElementById('playBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const soundBtn = document.getElementById('soundBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const timelineBar = document.getElementById('timelineBar');
+    const timelineFill = document.getElementById('timelineFill');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const statusMessage = document.getElementById('statusMessage');
+
+    const TOTAL_DURATION = 35.0; // 35 seconds
+    let currentTime = 0;
+    let isPlaying = false;
+    let soundEnabled = true;
+    let lastTimestamp = 0;
+    let animFrameId = null;
+
+    // Load actual screenshots
+    const images = {
+      landing: new Image(),
+      dashboard: new Image(),
+      fees: new Image(),
+      students: new Image(),
+      superadmin: new Image()
+    };
+    images.landing.src = 'screen_landing.png';
+    images.dashboard.src = 'screen_dashboard.png';
+    images.fees.src = 'screen_fees.png';
+    images.students.src = 'screen_students.png';
+    images.superadmin.src = 'screen_superadmin.png';
+
+    // Audio Synthesizer (Upbeat Modern Tech Beat)
+    let audioCtx = null;
+    let audioLoop = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playAudioTick(time) {
+      if (!soundEnabled || !audioCtx) return;
+      const beat = Math.floor(time * 2); // 120 bpm
+      if (time > 0 && Math.abs(time * 2 - Math.round(time * 2)) < 0.03) {
+        // Subtle bass kick
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(110, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(35, audioCtx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+      }
+    }
+
+    // Scene Definitions (Total 35 Seconds)
+    // Scene 1: 0.0s - 5.5s (Hook & Logo)
+    // Scene 2: 5.5s - 11.5s (Multi-Tenant & Super Admin)
+    // Scene 3: 11.5s - 17.5s (Academics & Students)
+    // Scene 4: 17.5s - 23.5s (PKR Finance & Invoices)
+    // Scene 5: 23.5s - 29.5s (Roles & Dark Mode)
+    // Scene 6: 29.5s - 35.0s (Launch CTA & Link)
+
+    function drawScene1(t) {
+      const rel = t; // 0 to 5.5
+      // Dark gradient background with moving orbs
+      const bgGrad = ctx.createRadialGradient(960 + Math.sin(rel) * 100, 540 + Math.cos(rel) * 50, 50, 960, 540, 1100);
+      bgGrad.addColorStop(0, '#1e1b4b');
+      bgGrad.addColorStop(0.5, '#0f172a');
+      bgGrad.addColorStop(1, '#020617');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, 1920, 1080);
+
+      // Glowing mesh particles
+      ctx.save();
+      for (let i = 0; i < 40; i++) {
+        const px = (Math.sin(i * 123 + rel * 0.5) * 0.5 + 0.5) * 1920;
+        const py = (Math.cos(i * 321 + rel * 0.4) * 0.5 + 0.5) * 1080;
+        ctx.fillStyle = `rgba(147, 197, 253, ${0.1 + Math.sin(rel * 2 + i) * 0.08})`;
+        ctx.beginPath();
+        ctx.arc(px, py, 2.5 + (i % 3), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // Animated Hook Badge
+      const badgeY = 240 + Math.sin(rel * 2) * 5;
+      ctx.save();
+      ctx.fillStyle = 'rgba(99, 102, 241, 0.15)';
+      ctx.strokeStyle = 'rgba(129, 140, 248, 0.4)';
+      ctx.lineWidth = 2;
+      roundRect(ctx, 640, badgeY - 25, 640, 50, 25);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#a5b4fc';
+      ctx.font = '800 18px "Plus Jakarta Sans"';
+      ctx.textAlign = 'center';
+      ctx.fillText('✨ NEXT-GENERATION EDUCATION MANAGEMENT SAAS', 960, badgeY + 7);
+      ctx.restore();
+
+      // Brand Logo & Icon (EV)
+      const scale = Math.min(1, rel * 1.5);
+      ctx.save();
+      ctx.translate(960, 420);
+      ctx.scale(scale, scale);
+
+      // Logo Glow
+      const glowGrad = ctx.createRadialGradient(0, 0, 10, 0, 0, 180);
+      glowGrad.addColorStop(0, 'rgba(168, 85, 247, 0.4)');
+      glowGrad.addColorStop(1, 'rgba(99, 102, 241, 0)');
+      ctx.fillStyle = glowGrad;
+      ctx.beginPath();
+      ctx.arc(0, 0, 180, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Logo Box
+      const boxGrad = ctx.createLinearGradient(-65, -65, 65, 65);
+      boxGrad.addColorStop(0, '#6366f1');
+      boxGrad.addColorStop(0.5, '#a855f7');
+      boxGrad.addColorStop(1, '#ec4899');
+      ctx.fillStyle = boxGrad;
+      roundRect(ctx, -75, -75, 150, 150, 36);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 70px "Plus Jakarta Sans"';
+      ctx.textAlign = 'center';
+      ctx.fillText('EV', 0, 26);
+      ctx.restore();
+
+      // Big Title
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 80px "Plus Jakarta Sans"';
+      ctx.textAlign = 'center';
+      ctx.fillText('Eduvora', 960, 620);
+
+      // Subtitle
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 32px "Plus Jakarta Sans"';
+      ctx.fillText('Everything Your Institution Needs, In One Powerful Platform.', 960, 690);
+
+      // Metric Badges
+      const badges = ['19+ Real Modules', '6 RBAC Roles', 'Multi-Tenant SaaS', 'Native PKR Support'];
+      badges.forEach((b, idx) => {
+        const bx = 420 + idx * 280;
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        roundRect(ctx, bx - 120, 770, 240, 56, 16);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = '800 18px "Plus Jakarta Sans"';
+        ctx.fillText(b, bx, 805);
+      });
+
+      // Bottom Subtitle bar
+      drawCaptions("Is your school, college, or university still trapped in clunky legacy software? Meet Eduvora.");
+    }
+
+    function drawScene2(t) {
+      const rel = t - 5.5; // 0 to 6.0
+      drawStandardBackground('#020617', '#172554');
+
+      // Header Section
+      drawSectionHeader("SUPER ADMIN CONTROL", "Manage Multi-Campus Institutions With Strict Data Isolation");
+
+      // Floating 3D mockup of Super Admin Screen
+      const img = images.superadmin;
+      if (img.complete && img.naturalWidth > 0) {
+        ctx.save();
+        ctx.translate(960, 560);
+        const floatY = Math.sin(rel * 2) * 8;
+        ctx.translate(0, floatY);
+
+        // Card Shadow & Border
+        ctx.shadowColor = 'rgba(99, 102, 241, 0.3)';
+        ctx.shadowBlur = 50;
+        ctx.fillStyle = '#0f172a';
+        roundRect(ctx, -600, -280, 1200, 640, 24);
+        ctx.fill();
+        ctx.shadowColor = 'transparent';
+
+        // Draw Image
+        ctx.drawImage(img, -590, -270, 1180, 620);
+
+        // Browser Header Simulation
+        ctx.fillStyle = '#090d16';
+        roundRect(ctx, -590, -270, 1180, 40, 12);
+        ctx.fill();
+        ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(-560, -250, 6, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#f59e0b'; ctx.beginPath(); ctx.arc(-540, -250, 6, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#10b981'; ctx.beginPath(); ctx.arc(-520, -250, 6, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#64748b'; ctx.font = '600 13px "JetBrains Mono"'; ctx.textAlign = 'left';
+        ctx.fillText('https://eduvora-lac.vercel.app/super-admin', -490, -245);
+        ctx.restore();
+      }
+
+      // Feature Callout Pills on Sides
+      drawPill(240, 420, "🏢 Multi-Branch Campus", "ABC School Main, North & Gulshan");
+      drawPill(240, 580, "🛡️ Strict Data Isolation", "Institutions never cross data");
+      drawPill(1680, 420, "👤 User Provisioning", "Create Admins, Teachers & Staff");
+      drawPill(1680, 580, "📈 Platform Analytics", "Cross-institution growth metrics");
+
+      drawCaptions("One unified Super Admin dashboard to create institutions, assign branches, and govern all tenant accounts.");
+    }
+
+    function drawScene3(t) {
+      const rel = t - 11.5; // 0 to 6.0
+      drawStandardBackground('#030712', '#1e1b4b');
+
+      drawSectionHeader("ACADEMIC OPERATIONS", "Student Lifecycle, Attendance & Examination Engine");
+
+      const img = images.students;
+      if (img.complete && img.naturalWidth > 0) {
+        ctx.save();
+        ctx.translate(960, 560);
+        const floatY = Math.sin(rel * 2) * 8;
+        ctx.translate(0, floatY);
+
+        ctx.shadowColor = 'rgba(168, 85, 247, 0.3)';
+        ctx.shadowBlur = 50;
+        ctx.fillStyle = '#0f172a';
+        roundRect(ctx, -600, -280, 1200, 640, 24);
+        ctx.fill();
+        ctx.shadowColor = 'transparent';
+
+        ctx.drawImage(img, -590, -270, 1180, 620);
+        ctx.restore();
+      }
+
+      // Feature Pills
+      drawPill(240, 420, "🎓 8-Tab Student Profile", "Admissions, fees, grades & docs");
+      drawPill(240, 580, "⚡ Smart Attendance Grid", "Duplicate-safe daily class roll");
+      drawPill(1680, 420, "📊 Exam Result Cards", "Automated grading & GPA calculation");
+      drawPill(1680, 580, "👨‍🏫 Faculty Allocations", "Subject & class teacher schedules");
+
+      drawCaptions("Manage complete student journeys — from admissions and daily QR attendance to examination reports.");
+    }
+
+    function drawScene4(t) {
+      const rel = t - 17.5; // 0 to 6.0
+      drawStandardBackground('#022c22', '#020617');
+
+      drawSectionHeader("PAKISTANI RUPEE (PKR) FINANCIALS", "Automated Fee Invoicing, Printable Receipts & Net Salaries");
+
+      const img = images.fees;
+      if (img.complete && img.naturalWidth > 0) {
+        ctx.save();
+        ctx.translate(960, 560);
+        const floatY = Math.sin(rel * 2) * 8;
+        ctx.translate(0, floatY);
+
+        ctx.shadowColor = 'rgba(16, 185, 129, 0.35)';
+        ctx.shadowBlur = 50;
+        ctx.fillStyle = '#064e3b';
+        roundRect(ctx, -600, -280, 1200, 640, 24);
+        ctx.fill();
+        ctx.shadowColor = 'transparent';
+
+        ctx.drawImage(img, -590, -270, 1180, 620);
+        ctx.restore();
+      }
+
+      // Prominent PKR Badge
+      drawPill(240, 420, "🇵🇰 Native PKR / Rs.", "Vouchers & ledgers formatted in Rs.");
+      drawPill(240, 580, "🧾 Instant Printable Receipts", "Partial & full payment receipts");
+      drawPill(1680, 420, "💼 Staff Salary Calculator", "Base + Bonus - Deduction - Advance");
+      drawPill(1680, 580, "📉 Expense Auditing", "Categorized operating expense logs");
+
+      drawCaptions("Tailor-made for Pakistani institutions with native PKR (Rs.) vouchers, partial collections, and salary payroll.");
+    }
+
+    function drawScene5(t) {
+      const rel = t - 23.5; // 0 to 6.0
+      drawStandardBackground('#09090b', '#18181b');
+
+      drawSectionHeader("MULTI-ROLE PERMISSION SYSTEM", "7 Dedicated Roles with Instant Dark / Light Mode");
+
+      // Roles Cards Layout
+      const roles = [
+        { role: "SUPER_ADMIN", desc: "Platform Owner", color: "#f59e0b" },
+        { role: "ADMIN", desc: "Campus Director", color: "#3b82f6" },
+        { role: "TEACHER", desc: "Classes & Grades", color: "#10b981" },
+        { role: "ACCOUNTANT", desc: "Fees & Payroll", color: "#ec4899" },
+        { role: "RECEPTIONIST", desc: "Front Desk & Inquiries", color: "#8b5cf6" },
+        { role: "PARENT", desc: "Child Portal", color: "#06b6d4" },
+        { role: "STUDENT", desc: "Timetables & Results", color: "#14b8a6" }
+      ];
+
+      roles.forEach((r, idx) => {
+        const col = idx % 4;
+        const row = Math.floor(idx / 4);
+        const x = 320 + col * 340;
+        const y = 380 + row * 180;
+
+        ctx.save();
+        ctx.fillStyle = 'rgba(24, 24, 27, 0.8)';
+        ctx.strokeStyle = r.color;
+        ctx.lineWidth = 2;
+        roundRect(ctx, x - 150, y - 60, 300, 120, 20);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = r.color;
+        ctx.font = '800 20px "JetBrains Mono"';
+        ctx.textAlign = 'center';
+        ctx.fillText(r.role, x, y - 10);
+
+        ctx.fillStyle = '#a1a1aa';
+        ctx.font = '600 15px "Plus Jakarta Sans"';
+        ctx.fillText(r.desc, x, y + 25);
+        ctx.restore();
+      });
+
+      // Bottom banner for dark mode
+      ctx.save();
+      ctx.fillStyle = 'rgba(39, 39, 42, 0.7)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+      roundRect(ctx, 480, 740, 960, 70, 20);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#f43f5e';
+      ctx.font = '800 22px "Plus Jakarta Sans"';
+      ctx.textAlign = 'center';
+      ctx.fillText('🌙 Native Tailwind v4 Dark Mode • Responsive Across Mobile & Desktop', 960, 784);
+      ctx.restore();
+
+      drawCaptions("Every stakeholder sees exactly what they need. Zero clutter, secure access tokens, and sleek dark mode.");
+    }
+
+    function drawScene6(t) {
+      const rel = t - 29.5; // 0 to 5.5
+      drawStandardBackground('#0f172a', '#311042');
+
+      // Final CTA
+      ctx.save();
+      ctx.translate(960, 300);
+
+      // Pulse Glow
+      const glow = Math.sin(rel * 4) * 20;
+      ctx.shadowColor = '#6366f1';
+      ctx.shadowBlur = 40 + glow;
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 68px "Plus Jakarta Sans"';
+      ctx.textAlign = 'center';
+      ctx.fillText('Empower Your Institution Today.', 0, 0);
+      ctx.shadowBlur = 0;
+
+      ctx.fillStyle = '#c084fc';
+      ctx.font = '700 28px "Plus Jakarta Sans"';
+      ctx.fillText('The Modern Education Management SaaS You Have Been Waiting For.', 0, 60);
+      ctx.restore();
+
+      // Big Interactive URL Display
+      ctx.save();
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+      ctx.strokeStyle = '#a855f7';
+      ctx.lineWidth = 3;
+      roundRect(ctx, 480, 440, 960, 140, 28);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '700 20px "JetBrains Mono"';
+      ctx.textAlign = 'center';
+      ctx.fillText('LIVE DEPLOYMENT ON VERCEL:', 960, 485);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 38px "JetBrains Mono"';
+      ctx.fillText('https://eduvora-lac.vercel.app', 960, 545);
+      ctx.restore();
+
+      // GitHub and Author
+      ctx.save();
+      ctx.fillStyle = 'rgba(30, 41, 59, 0.8)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+      roundRect(ctx, 560, 630, 800, 70, 20);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '700 20px "Plus Jakarta Sans"';
+      ctx.textAlign = 'center';
+      ctx.fillText('GitHub: github.com/AhmedRaza2007/eduvora  •  Built with Next.js & Prisma', 960, 674);
+      ctx.restore();
+
+      // CTA Button simulation
+      ctx.save();
+      const btnScale = 1 + Math.sin(rel * 5) * 0.03;
+      ctx.translate(960, 770);
+      ctx.scale(btnScale, btnScale);
+      const btnGrad = ctx.createLinearGradient(-180, 0, 180, 0);
+      btnGrad.addColorStop(0, '#6366f1');
+      btnGrad.addColorStop(0.5, '#a855f7');
+      btnGrad.addColorStop(1, '#ec4899');
+      ctx.fillStyle = btnGrad;
+      roundRect(ctx, -200, -35, 400, 70, 35);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 24px "Plus Jakarta Sans"';
+      ctx.textAlign = 'center';
+      ctx.fillText('TRY LIVE DEMO →', 0, 9);
+      ctx.restore();
+
+      drawCaptions("Transform your school or academy operations today. Try the live interactive demo at eduvora-lac.vercel.app");
+    }
+
+    // Helper functions
+    function drawStandardBackground(c1, c2) {
+      const bg = ctx.createLinearGradient(0, 0, 1920, 1080);
+      bg.addColorStop(0, c1);
+      bg.addColorStop(1, c2);
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, 1920, 1080);
+
+      // Grid overlay
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < 1920; x += 80) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 1080); ctx.stroke();
+      }
+      for (let y = 0; y < 1080; y += 80) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(1920, y); ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawSectionHeader(badgeText, titleText) {
+      ctx.save();
+      ctx.textAlign = 'center';
+
+      // Badge
+      ctx.fillStyle = 'rgba(99, 102, 241, 0.2)';
+      ctx.strokeStyle = 'rgba(129, 140, 248, 0.5)';
+      ctx.lineWidth = 1.5;
+      roundRect(ctx, 760, 45, 400, 42, 21);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#a5b4fc';
+      ctx.font = '800 16px "Plus Jakarta Sans"';
+      ctx.fillText(badgeText, 960, 72);
+
+      // Main Title
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '900 44px "Plus Jakarta Sans"';
+      ctx.fillText(titleText, 960, 145);
+      ctx.restore();
+    }
+
+    function drawPill(x, y, title, subtitle) {
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.lineWidth = 1.5;
+      roundRect(ctx, x - 180, y - 55, 360, 110, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = '800 18px "Plus Jakarta Sans"';
+      ctx.fillText(title, x, y - 10);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 14px "Plus Jakarta Sans"';
+      ctx.fillText(subtitle, x, y + 20);
+      ctx.restore();
+    }
+
+    function drawCaptions(text) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(2, 6, 23, 0.9)';
+      ctx.fillRect(0, 960, 1920, 120);
+
+      // Top accent border
+      const borderGrad = ctx.createLinearGradient(0, 0, 1920, 0);
+      borderGrad.addColorStop(0, '#6366f1');
+      borderGrad.addColorStop(0.5, '#a855f7');
+      borderGrad.addColorStop(1, '#ec4899');
+      ctx.fillStyle = borderGrad;
+      ctx.fillRect(0, 960, 1920, 4);
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '700 26px "Plus Jakarta Sans"';
+      ctx.textAlign = 'center';
+      ctx.fillText(text, 960, 1030);
+      ctx.restore();
+    }
+
+    function roundRect(ctx, x, y, width, height, radius) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    }
+
+    function updatePills(t) {
+      document.querySelectorAll('.scene-pill').forEach(p => p.classList.remove('active'));
+      if (t < 5.5) document.getElementById('sp1').classList.add('active');
+      else if (t < 11.5) document.getElementById('sp2').classList.add('active');
+      else if (t < 17.5) document.getElementById('sp3').classList.add('active');
+      else if (t < 23.5) document.getElementById('sp4').classList.add('active');
+      else if (t < 29.5) document.getElementById('sp5').classList.add('active');
+      else document.getElementById('sp6').classList.add('active');
+    }
+
+    function render(time) {
+      ctx.clearRect(0, 0, 1920, 1080);
+      if (time < 5.5) {
+        drawScene1(time);
+      } else if (time < 11.5) {
+        drawScene2(time);
+      } else if (time < 17.5) {
+        drawScene3(time);
+      } else if (time < 23.5) {
+        drawScene4(time);
+      } else if (time < 29.5) {
+        drawScene5(time);
+      } else {
+        drawScene6(time);
+      }
+
+      // Update progress bar
+      const pct = (time / TOTAL_DURATION) * 100;
+      timelineFill.style.width = pct + '%';
+      const m = Math.floor(time / 60).toString().padStart(2, '0');
+      const s = Math.floor(time % 60).toString().padStart(2, '0');
+      timeDisplay.textContent = `${m}:${s} / 00:35`;
+
+      updatePills(time);
+      playAudioTick(time);
+    }
+
+    function loop(timestamp) {
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      const delta = (timestamp - lastTimestamp) / 1000;
+      lastTimestamp = timestamp;
+
+      currentTime += delta;
+      if (currentTime >= TOTAL_DURATION) {
+        currentTime = TOTAL_DURATION;
+        render(currentTime);
+        pause();
+        return;
+      }
+
+      render(currentTime);
+      if (isPlaying) {
+        animFrameId = requestAnimationFrame(loop);
+      }
+    }
+
+    function play() {
+      initAudio();
+      isPlaying = true;
+      lastTimestamp = 0;
+      playBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg> Pause';
+      statusMessage.textContent = 'Playing...';
+      if (currentTime >= TOTAL_DURATION) currentTime = 0;
+      animFrameId = requestAnimationFrame(loop);
+    }
+
+    function pause() {
+      isPlaying = false;
+      playBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Play Video';
+      statusMessage.textContent = 'Paused';
+      if (animFrameId) cancelAnimationFrame(animFrameId);
+    }
+
+    playBtn.addEventListener('click', () => {
+      if (isPlaying) pause();
+      else play();
+    });
+
+    restartBtn.addEventListener('click', () => {
+      pause();
+      currentTime = 0;
+      render(0);
+    });
+
+    soundBtn.addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      soundBtn.innerHTML = soundEnabled ?
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg> Music: On' :
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg> Music: Off';
+    });
+
+    timelineBar.addEventListener('click', (e) => {
+      const rect = timelineBar.getBoundingClientRect();
+      const pos = (e.clientX - rect.left) / rect.width;
+      currentTime = Math.max(0, Math.min(TOTAL_DURATION, pos * TOTAL_DURATION));
+      render(currentTime);
+    });
+
+    // High Resolution 1080p Video Exporter
+    exportBtn.addEventListener('click', async () => {
+      exportVideo();
+    });
+
+    async function exportVideo() {
+      pause();
+      statusMessage.textContent = 'Recording 1080p video (35s)... Please wait';
+      exportBtn.disabled = true;
+      exportBtn.textContent = 'Recording (0%)...';
+
+      const stream = canvas.captureStream(30);
+      const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm';
+      const recorder = new MediaRecorder(stream, {
+        mimeType: mime,
+        videoBitsPerSecond: 8000000 // 8 Mbps high quality 1080p
+      });
+
+      const chunks = [];
+      recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: mime });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'eduvora-linkedin-launch-video-1080p.webm';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        statusMessage.textContent = 'Video exported successfully!';
+        exportBtn.disabled = false;
+        exportBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export 1080p Video (.webm)';
+      };
+
+      recorder.start(100);
+
+      // Render exactly 35 seconds at 30 fps (1050 frames)
+      const fps = 30;
+      const totalFrames = Math.floor(TOTAL_DURATION * fps);
+      for (let f = 0; f <= totalFrames; f++) {
+        const t = f / fps;
+        render(t);
+        exportBtn.textContent = `Recording (${Math.round((f / totalFrames) * 100)}%)...`;
+        await new Promise(r => setTimeout(r, 1000 / fps));
+      }
+
+      recorder.stop();
+    }
+
+    // Initial render
+    setTimeout(() => {
+      render(0);
+    }, 300);
+
+    // Expose for headless puppeteer script
+    window.eduvoraRecordHeadless = async function() {
+      return new Promise(async (resolve) => {
+        const stream = canvas.captureStream(30);
+        const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9' : 'video/webm';
+        const recorder = new MediaRecorder(stream, {
+          mimeType: mime,
+          videoBitsPerSecond: 8000000
+        });
+        const chunks = [];
+        recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+        recorder.onstop = () => {
+          const blob = new Blob(chunks, { type: mime });
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            resolve({
+              size: blob.size,
+              base64: reader.result.split(',')[1]
+            });
+          };
+          reader.readAsDataURL(blob);
+        };
+
+        recorder.start(100);
+        const fps = 30;
+        const totalFrames = Math.floor(TOTAL_DURATION * fps);
+        for (let f = 0; f <= totalFrames; f++) {
+          const t = f / fps;
+          render(t);
+          await new Promise(r => setTimeout(r, 1000 / fps));
+        }
+        recorder.stop();
+      });
+    };
+  </script>
+</body>
+</html>
