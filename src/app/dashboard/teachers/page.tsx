@@ -15,6 +15,7 @@ import { useToast } from '@/context/ToastContext';
 import { Modal } from '@/components/ui/Modal';
 import { Badge } from '@/components/ui/Badge';
 import { TableSkeleton } from '@/components/ui/Skeleton';
+import { formatPKR } from '@/lib/currency';
 
 export default function TeachersPage() {
   const { toast } = useToast();
@@ -107,7 +108,7 @@ export default function TeachersPage() {
                 <div className="space-y-1.5 text-xs text-gray-600 dark:text-slate-300 pt-3 border-t border-gray-200/60 dark:border-slate-700/60">
                   <p className="flex items-center gap-2"><Mail className="w-3.5 h-3.5 text-gray-400" /> {t.email}</p>
                   <p className="flex items-center gap-2"><Phone className="w-3.5 h-3.5 text-gray-400" /> {t.phone}</p>
-                  <p className="flex items-center gap-2"><DollarSign className="w-3.5 h-3.5 text-emerald-500" /> Base Salary: <span className="font-mono font-bold text-emerald-600">${t.salary?.toLocaleString()}</span></p>
+                  <p className="flex items-center gap-2"><DollarSign className="w-3.5 h-3.5 text-emerald-500" /> Base Salary: <span className="font-mono font-bold text-emerald-600">{formatPKR(t.salary)}</span></p>
                 </div>
               </div>
             ))}

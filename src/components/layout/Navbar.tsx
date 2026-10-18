@@ -3,11 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRole } from '@/context/RoleContext';
-import { useTheme } from 'next-themes';
+import { ThemeSelector } from '@/components/ui/ThemeSelector';
 import {
   Bell,
-  Sun,
-  Moon,
   Search,
   Menu,
   CheckCircle2,
@@ -26,7 +24,6 @@ interface NavbarProps {
 
 export function Navbar({ onOpenMobileMenu }: NavbarProps) {
   const { user, role, selectedBranchId, setSelectedBranchId, branches, logout } = useRole();
-  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -122,16 +119,8 @@ export function Navbar({ onOpenMobileMenu }: NavbarProps) {
             </Link>
           )}
 
-          {/* Dark / Light Mode Toggle */}
-          {mounted && (
-            <button
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="p-2 text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
-              title="Toggle Theme"
-            >
-              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-600" />}
-            </button>
-          )}
+          {/* Theme Selector (Light, Dark, System) */}
+          <ThemeSelector />
 
           {/* Notifications Dropdown */}
           <div className="relative">

@@ -18,6 +18,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Badge } from '@/components/ui/Badge';
 import { ReceiptModal } from '@/components/ui/ReceiptModal';
 import { TableSkeleton } from '@/components/ui/Skeleton';
+import { formatPKR } from '@/lib/currency';
 
 export default function FeesPage() {
   const { toast } = useToast();
@@ -187,9 +188,9 @@ export default function FeesPage() {
                         <span className="block text-[10px] text-gray-400">{inv.feeType?.name}</span>
                       </td>
                       <td className="py-3 px-2 font-mono text-gray-500">{inv.dueDate}</td>
-                      <td className="py-3 px-2 font-mono font-bold text-gray-900 dark:text-white">${inv.amount?.toFixed(2)}</td>
-                      <td className="py-3 px-2 font-mono text-emerald-600 font-semibold">${inv.paidAmount?.toFixed(2)}</td>
-                      <td className="py-3 px-2 font-mono font-bold text-rose-600 dark:text-rose-400">${remaining.toFixed(2)}</td>
+                      <td className="py-3 px-2 font-mono font-bold text-gray-900 dark:text-white">{formatPKR(inv.amount)}</td>
+                      <td className="py-3 px-2 font-mono text-emerald-600 font-semibold">{formatPKR(inv.paidAmount)}</td>
+                      <td className="py-3 px-2 font-mono font-bold text-rose-600 dark:text-rose-400">{formatPKR(remaining)}</td>
                       <td className="py-3 px-2">
                         <Badge
                           variant={

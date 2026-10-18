@@ -19,6 +19,7 @@ import {
   FileCheck,
   Calendar,
 } from 'lucide-react';
+import { formatPKR } from '@/lib/currency';
 import { CardSkeleton, TableSkeleton } from '@/components/ui/Skeleton';
 import { Badge } from '@/components/ui/Badge';
 import {
@@ -147,10 +148,10 @@ export default function DashboardOverviewPage() {
             </div>
           </div>
           <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-2">
-            ${stats.feeCollection?.toLocaleString() || '0'}
+            {formatPKR(stats.feeCollection)}
           </p>
           <p className="text-[11px] text-amber-600 dark:text-amber-400 font-semibold mt-1">
-            Pending: ${stats.pendingFees?.toLocaleString() || '0'}
+            Pending: {formatPKR(stats.pendingFees)}
           </p>
         </div>
 
@@ -162,7 +163,7 @@ export default function DashboardOverviewPage() {
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black mt-2">${stats.netBalance?.toLocaleString() || '0'}</p>
+          <p className="text-2xl font-black mt-2">{formatPKR(stats.netBalance)}</p>
           <p className="text-[10px] text-indigo-200 mt-1">Formula: Revenue - Expenses - Salaries</p>
         </div>
       </div>

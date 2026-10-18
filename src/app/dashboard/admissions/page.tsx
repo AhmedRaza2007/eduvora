@@ -6,6 +6,7 @@ import { useToast } from '@/context/ToastContext';
 import { Modal } from '@/components/ui/Modal';
 import { Badge } from '@/components/ui/Badge';
 import { TableSkeleton } from '@/components/ui/Skeleton';
+import { formatPKR } from '@/lib/currency';
 
 export default function AdmissionsPage() {
   const { toast } = useToast();
@@ -138,7 +139,7 @@ export default function AdmissionsPage() {
                       {adm.parentName}
                       <span className="block text-[10px] text-gray-400">{adm.parentPhone}</span>
                     </td>
-                    <td className="py-3 px-2 font-mono font-bold">${adm.admissionFee?.toFixed(2)}</td>
+                    <td className="py-3 px-2 font-mono font-bold">{formatPKR(adm.admissionFee)}</td>
                     <td className="py-3 px-2">
                       <Badge
                         variant={

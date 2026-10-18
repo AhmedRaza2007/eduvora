@@ -6,6 +6,7 @@ import { useToast } from '@/context/ToastContext';
 import { Modal } from '@/components/ui/Modal';
 import { Badge } from '@/components/ui/Badge';
 import { TableSkeleton } from '@/components/ui/Skeleton';
+import { formatPKR } from '@/lib/currency';
 
 export default function StaffPage() {
   const { toast } = useToast();
@@ -103,7 +104,7 @@ export default function StaffPage() {
                       {s.phone}
                       {s.email && <span className="block text-[10px] text-gray-400">{s.email}</span>}
                     </td>
-                    <td className="py-3 px-2 font-mono font-bold text-emerald-600">${s.salary?.toLocaleString()}</td>
+                    <td className="py-3 px-2 font-mono font-bold text-emerald-600">{formatPKR(s.salary)}</td>
                     <td className="py-3 px-2">
                       <Badge variant={s.status === 'ACTIVE' ? 'emerald' : 'rose'}>{s.status}</Badge>
                     </td>

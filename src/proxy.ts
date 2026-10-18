@@ -113,6 +113,12 @@ export function proxy(request: NextRequest) {
     if (user.role === 'TEACHER' && pathname === '/dashboard') {
       return NextResponse.redirect(new URL('/teacher', request.url));
     }
+    if (user.role === 'ACCOUNTANT' && pathname === '/dashboard') {
+      return NextResponse.redirect(new URL('/dashboard/fees', request.url));
+    }
+    if (user.role === 'RECEPTIONIST' && pathname === '/dashboard') {
+      return NextResponse.redirect(new URL('/reception', request.url));
+    }
     if (user.role === 'PARENT' && pathname === '/dashboard') {
       return NextResponse.redirect(new URL('/parent', request.url));
     }

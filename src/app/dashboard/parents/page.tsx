@@ -82,7 +82,7 @@ export default function ParentsPage() {
 
             <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 shadow-sm space-y-2">
               <span className="text-xs text-gray-400 font-bold uppercase">Outstanding Fees</span>
-              <p className="text-2xl font-black text-rose-600 dark:text-rose-400">$100.00</p>
+              <p className="text-2xl font-black text-rose-600 dark:text-rose-400">Rs. 15,000</p>
               <p className="text-[11px] text-amber-600 font-semibold">Mid-Term Exam Fee Partial</p>
             </div>
 

@@ -64,6 +64,9 @@ export async function POST(req: NextRequest) {
       case 'TEACHER':
         redirectTo = '/teacher';
         break;
+      case 'ACCOUNTANT':
+        redirectTo = '/dashboard/fees';
+        break;
       case 'PARENT':
         redirectTo = '/parent';
         break;

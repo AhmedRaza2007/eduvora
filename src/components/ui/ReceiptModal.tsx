@@ -3,6 +3,7 @@
 import React from 'react';
 import { Modal } from './Modal';
 import { Printer, Download, CheckCircle2 } from 'lucide-react';
+import { formatPKR } from '@/lib/currency';
 
 interface ReceiptModalProps {
   isOpen: boolean;
@@ -72,8 +73,8 @@ export function ReceiptModal({ isOpen, onClose, payment }: ReceiptModalProps) {
                 {invoice.title || 'Academic Fee'}
                 {payment.transactionRef && <span className="block text-xs text-gray-400 font-mono">Ref: {payment.transactionRef}</span>}
               </td>
-              <td className="py-3 text-right font-mono text-gray-600 dark:text-slate-300">${invoice.amount?.toFixed(2)}</td>
-              <td className="py-3 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400">${payment.amountPaid?.toFixed(2)}</td>
+              <td className="py-3 text-right font-mono text-gray-600 dark:text-slate-300">{formatPKR(invoice.amount)}</td>
+              <td className="py-3 text-right font-mono font-bold text-emerald-600 dark:text-emerald-400">{formatPKR(payment.amountPaid)}</td>
             </tr>
           </tbody>
         </table>
@@ -83,16 +84,16 @@ export function ReceiptModal({ isOpen, onClose, payment }: ReceiptModalProps) {
           <div className="w-48 space-y-1 text-xs">
             <div className="flex justify-between text-gray-500">
               <span>Total Invoice:</span>
-              <span className="font-mono">${invoice.amount?.toFixed(2)}</span>
+              <span className="font-mono">{formatPKR(invoice.amount)}</span>
             </div>
             <div className="flex justify-between text-gray-500">
               <span>Amount Paid:</span>
-              <span className="font-mono font-bold text-emerald-600">${payment.amountPaid?.toFixed(2)}</span>
+              <span className="font-mono font-bold text-emerald-600">{formatPKR(payment.amountPaid)}</span>
             </div>
             <div className="flex justify-between font-bold text-sm text-gray-900 dark:text-white pt-2 border-t">
               <span>Remaining Balance:</span>
               <span className="font-mono text-indigo-600 dark:text-indigo-400">
-                ${Math.max(0, (invoice.amount || 0) - (invoice.paidAmount || 0)).toFixed(2)}
+                {formatPKR(Math.max(0, (invoice.amount || 0) - (invoice.paidAmount || 0)))}
               </span>
             </div>
           </div>

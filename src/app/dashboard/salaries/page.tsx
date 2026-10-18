@@ -6,6 +6,7 @@ import { useToast } from '@/context/ToastContext';
 import { Modal } from '@/components/ui/Modal';
 import { Badge } from '@/components/ui/Badge';
 import { TableSkeleton } from '@/components/ui/Skeleton';
+import { formatPKR } from '@/lib/currency';
 
 export default function SalariesPage() {
   const { toast } = useToast();
@@ -131,11 +132,11 @@ export default function SalariesPage() {
                         <span className="block text-[10px] text-gray-400">{sal.staffType}</span>
                       </td>
                       <td className="py-3 px-2 text-gray-600 dark:text-slate-300">{sal.month} {sal.year}</td>
-                      <td className="py-3 px-2 font-mono">${sal.baseSalary?.toFixed(2)}</td>
+                      <td className="py-3 px-2 font-mono">{formatPKR(sal.baseSalary)}</td>
                       <td className="py-3 px-2 text-gray-500 font-mono text-[11px]">
-                        +${sal.bonus} / -${sal.deduction + sal.advance}
+                        +{formatPKR(sal.bonus)} / -{formatPKR(sal.deduction + sal.advance)}
                       </td>
-                      <td className="py-3 px-2 font-mono font-bold text-emerald-600 text-sm">${sal.netSalary?.toFixed(2)}</td>
+                      <td className="py-3 px-2 font-mono font-bold text-emerald-600 text-sm">{formatPKR(sal.netSalary)}</td>
                       <td className="py-3 px-2">
                         <Badge variant={sal.status === 'PAID' ? 'emerald' : 'amber'}>{sal.status}</Badge>
                       </td>
@@ -281,13 +282,13 @@ export default function SalariesPage() {
             </div>
 
             <div className="space-y-1 pt-2 border-t font-mono">
-              <div className="flex justify-between"><span>Base Salary:</span> <span>${selectedSalarySlip.baseSalary?.toFixed(2)}</span></div>
-              <div className="flex justify-between text-emerald-600"><span>Bonus:</span> <span>+${selectedSalarySlip.bonus?.toFixed(2)}</span></div>
-              <div className="flex justify-between text-rose-500"><span>Deduction:</span> <span>-${selectedSalarySlip.deduction?.toFixed(2)}</span></div>
-              <div className="flex justify-between text-rose-500"><span>Advance:</span> <span>-${selectedSalarySlip.advance?.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span>Base Salary:</span> <span>{formatPKR(selectedSalarySlip.baseSalary)}</span></div>
+              <div className="flex justify-between text-emerald-600"><span>Bonus:</span> <span>+{formatPKR(selectedSalarySlip.bonus)}</span></div>
+              <div className="flex justify-between text-rose-500"><span>Deduction:</span> <span>-{formatPKR(selectedSalarySlip.deduction)}</span></div>
+              <div className="flex justify-between text-rose-500"><span>Advance:</span> <span>-{formatPKR(selectedSalarySlip.advance)}</span></div>
               <div className="flex justify-between font-bold text-sm text-gray-900 dark:text-white border-t pt-2">
                 <span>Net Salary Paid:</span>
-                <span className="text-indigo-600">${selectedSalarySlip.netSalary?.toFixed(2)}</span>
+                <span className="text-indigo-600">{formatPKR(selectedSalarySlip.netSalary)}</span>
               </div>
             </div>
 

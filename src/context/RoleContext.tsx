@@ -82,9 +82,24 @@ export const RoleProvider = ({ children }: { children: React.ReactNode }) => {
         if (data.user.branchId) {
           setSelectedBranchId(data.user.branchId);
         }
+      } else {
+        // If not authenticated (direct dashboard entry in demo mode), initialize real session cookie
+        const initRes = await fetch('/api/auth/demo-switch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: 'ADMIN' }),
+        });
+        const initData = await initRes.json();
+        if (initData.success && initData.user) {
+          setUserState(initData.user);
+          setRoleState(initData.user.role as UserRole);
+          if (initData.user.branchId) {
+            setSelectedBranchId(initData.user.branchId);
+          }
+        }
       }
     } catch {
-      // Offline or demo mode fallback
+      // Offline fallback
     }
   };
 
@@ -108,27 +123,28 @@ export const RoleProvider = ({ children }: { children: React.ReactNode }) => {
       .catch(() => {});
   }, []);
 
-  const setRole = (newRole: UserRole) => {
-    setRoleState(newRole);
-    const roleProfiles: Record<UserRole, { name: string; email: string }> = {
-      SUPER_ADMIN: { name: 'Eduvora SuperAdmin', email: 'superadmin@eduvora.com' },
-      OWNER: { name: 'Dr. Arthur Pendelton (Owner)', email: 'admin@eduvora.edu' },
-      ADMIN: { name: 'Dr. Arthur Pendelton (Admin)', email: 'admin@eduvora.edu' },
-      TEACHER: { name: 'Prof. Sarah Jenkins (Teacher)', email: 'teacher@eduvora.edu' },
-      ACCOUNTANT: { name: 'Robert Sterling (Accountant)', email: 'accountant@eduvora.edu' },
-      RECEPTIONIST: { name: 'Emily Watson (Receptionist)', email: 'reception@eduvora.edu' },
-      STAFF: { name: 'James Wilson (Staff)', email: 'staff@eduvora.edu' },
-      PARENT: { name: 'Michael Vance (Parent)', email: 'parent@eduvora.edu' },
-      STUDENT: { name: 'Lucas Vance (Student)', email: 'student@eduvora.edu' },
-    };
+  const setRole = async (newRole: UserRole) => {
+    try {
+      const res = await fetch('/api/auth/demo-switch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: newRole }),
+      });
+      const data = await res.json();
+      if (data.success && data.user) {
+        setRoleState(newRole);
+        setUserState(data.user);
+        if (data.user.branchId) {
+          setSelectedBranchId(data.user.branchId);
+        }
+        return data;
+      }
+    } catch (e) {
+      console.error('Failed to switch role session on server:', e);
+    }
 
-    const profile = roleProfiles[newRole] || roleProfiles.ADMIN;
-    setUserState((prev) => ({
-      ...prev,
-      role: newRole,
-      name: profile.name,
-      email: profile.email,
-    }));
+    // Fallback in-memory state
+    setRoleState(newRole);
   };
 
   const hasPermission = (moduleName: string): boolean => {

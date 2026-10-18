@@ -6,6 +6,7 @@ import { useToast } from '@/context/ToastContext';
 import { Modal } from '@/components/ui/Modal';
 import { Badge } from '@/components/ui/Badge';
 import { TableSkeleton } from '@/components/ui/Skeleton';
+import { formatPKR } from '@/lib/currency';
 
 export default function ExpensesPage() {
   const { toast } = useToast();
@@ -113,7 +114,7 @@ export default function ExpensesPage() {
 
         <div className="flex items-center gap-2 bg-rose-50 dark:bg-rose-950/50 px-4 py-2 rounded-xl border border-rose-200 dark:border-rose-900/50 text-rose-700 dark:text-rose-300 font-bold">
           <span>Total Filtered Expense:</span>
-          <span className="font-mono text-base">${totalExpense?.toLocaleString()}</span>
+          <span className="font-mono text-base">{formatPKR(totalExpense)}</span>
         </div>
       </div>
 
@@ -148,7 +149,7 @@ export default function ExpensesPage() {
                     <td className="py-3 px-2 font-mono text-gray-500">{e.date}</td>
                     <td className="py-3 px-2 font-semibold text-gray-700 dark:text-slate-300">{e.paymentMethod}</td>
                     <td className="py-3 px-2 text-right font-mono font-bold text-rose-600 dark:text-rose-400">
-                      -${e.amount?.toFixed(2)}
+                      -{formatPKR(e.amount)}
                     </td>
                   </tr>
                 ))}

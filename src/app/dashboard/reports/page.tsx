@@ -5,6 +5,7 @@ import { BarChart3, Download, Printer, Filter } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
 import { Badge } from '@/components/ui/Badge';
 import { TableSkeleton } from '@/components/ui/Skeleton';
+import { formatPKR } from '@/lib/currency';
 
 export default function ReportsPage() {
   const { toast } = useToast();
@@ -111,19 +112,19 @@ export default function ReportsPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                   <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200">
                     <span className="text-xs text-gray-500">Total Fee Revenue</span>
-                    <p className="text-2xl font-black text-emerald-600">${reportData?.summary?.totalRevenue?.toLocaleString()}</p>
+                    <p className="text-2xl font-black text-emerald-600">{formatPKR(reportData?.summary?.totalRevenue)}</p>
                   </div>
                   <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200">
                     <span className="text-xs text-gray-500">Total Expenses</span>
-                    <p className="text-2xl font-black text-rose-600">${reportData?.summary?.totalExpenses?.toLocaleString()}</p>
+                    <p className="text-2xl font-black text-rose-600">{formatPKR(reportData?.summary?.totalExpenses)}</p>
                   </div>
                   <div className="p-4 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200">
                     <span className="text-xs text-gray-500">Staff Salaries</span>
-                    <p className="text-2xl font-black text-purple-600">${reportData?.summary?.totalSalaries?.toLocaleString()}</p>
+                    <p className="text-2xl font-black text-purple-600">{formatPKR(reportData?.summary?.totalSalaries)}</p>
                   </div>
                   <div className="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200">
                     <span className="text-xs text-gray-500">Net Profit</span>
-                    <p className="text-2xl font-black text-indigo-600">${reportData?.summary?.netProfit?.toLocaleString()}</p>
+                    <p className="text-2xl font-black text-indigo-600">{formatPKR(reportData?.summary?.netProfit)}</p>
                   </div>
                 </div>
               </div>

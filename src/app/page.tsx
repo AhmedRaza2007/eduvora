@@ -188,15 +188,15 @@ export default function LandingPage() {
                 </div>
                 <div className="p-4 rounded-xl bg-emerald-950/50 border border-emerald-800/40">
                   <p className="text-xs text-emerald-300">Fee Revenue</p>
-                  <p className="text-2xl font-black text-emerald-400 mt-1">$48,250</p>
+                  <p className="text-2xl font-black text-emerald-400 mt-1">Rs. 4,825,000</p>
                 </div>
                 <div className="p-4 rounded-xl bg-amber-950/50 border border-amber-800/40">
                   <p className="text-xs text-amber-300">Pending Fees</p>
-                  <p className="text-2xl font-black text-amber-400 mt-1">$6,100</p>
+                  <p className="text-2xl font-black text-amber-400 mt-1">Rs. 610,000</p>
                 </div>
                 <div className="p-4 rounded-xl bg-rose-950/50 border border-rose-800/40">
                   <p className="text-xs text-rose-300">Net Balance</p>
-                  <p className="text-2xl font-black text-white mt-1">$29,400</p>
+                  <p className="text-2xl font-black text-white mt-1">Rs. 2,940,000</p>
                 </div>
               </div>
 

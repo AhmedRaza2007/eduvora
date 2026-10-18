@@ -23,6 +23,7 @@ import {
 import { useToast } from '@/context/ToastContext';
 import { Badge } from '@/components/ui/Badge';
 import { ReceiptModal } from '@/components/ui/ReceiptModal';
+import { formatPKR } from '@/lib/currency';
 import { ResultCardModal } from '@/components/ui/ResultCardModal';
 
 export default function StudentProfilePage() {
@@ -224,7 +225,7 @@ export default function StudentProfilePage() {
                   <tr key={inv.id}>
                     <td className="py-2.5 font-mono font-bold text-indigo-600">{inv.invoiceNo}</td>
                     <td className="py-2.5 font-semibold">{inv.title}</td>
-                    <td className="py-2.5 font-mono">${inv.amount?.toFixed(2)}</td>
+                    <td className="py-2.5 font-mono">{formatPKR(inv.amount)}</td>
                     <td className="py-2.5"><Badge variant={inv.status === 'PAID' ? 'emerald' : 'amber'}>{inv.status}</Badge></td>
                     <td className="py-2.5 text-right">
                       {inv.payments?.[0] ? (
